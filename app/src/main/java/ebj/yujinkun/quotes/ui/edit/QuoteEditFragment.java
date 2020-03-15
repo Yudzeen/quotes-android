@@ -15,17 +15,20 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
 
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.Objects;
 
 import ebj.yujinkun.quotes.R;
+import ebj.yujinkun.quotes.model.Quote;
 
 public class QuoteEditFragment extends Fragment {
 
     private static final String TAG = QuoteEditFragment.class.getSimpleName();
 
+    private QuoteEditViewModel quoteEditViewModel;
     private TextInputLayout contentLayout;
     private TextInputLayout quoteeLayout;
 
@@ -33,6 +36,8 @@ public class QuoteEditFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_quote_edit, container, false);
+
+        quoteEditViewModel = ViewModelProviders.of(this).get(QuoteEditViewModel.class);
 
         setHasOptionsMenu(true);
 
@@ -77,6 +82,11 @@ public class QuoteEditFragment extends Fragment {
 
     private void save() {
         if (validate()) {
+            Quote quote = new Quote.Builder()
+                    .setContent(Objects.requireNonNull(contentLayout.getEditText()).getText().toString())
+                    .setQuotee(Objects.requireNonNull(quoteeLayout.getEditText()).getText().toString())
+                    .build();
+            quoteEditViewModel.insert(quote);
             Toast.makeText(requireContext(), "Saved.", Toast.LENGTH_SHORT).show();
         }
     }

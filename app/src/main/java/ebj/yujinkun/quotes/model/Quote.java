@@ -2,22 +2,38 @@ package ebj.yujinkun.quotes.model;
 
 import android.text.TextUtils;
 
+import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
 import java.util.Objects;
 import java.util.UUID;
 
 import ebj.yujinkun.quotes.util.DateUtil;
 
+@Entity
 public class Quote {
 
     public static final String DEFAULT_QUOTEE = "Anonymous";
 
+    @PrimaryKey
+    @NonNull
     private final String id;
+
+    @ColumnInfo
     private final String content;
+
+    @ColumnInfo
     private final String quotee;
+
+    @ColumnInfo(name = "date_created")
     private final String dateCreated;
+
+    @ColumnInfo(name = "date_modified")
     private final String dateModified;
 
-    public Quote(String id, String content, String quotee, String dateCreated, String dateModified) {
+    public Quote(@NonNull String id, String content, String quotee, String dateCreated, String dateModified) {
         this.id = id;
         this.content = content;
         this.quotee = quotee;
@@ -25,6 +41,7 @@ public class Quote {
         this.dateModified = dateModified;
     }
 
+    @NonNull
     public String getId() {
         return id;
     }
