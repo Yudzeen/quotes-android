@@ -25,4 +25,12 @@ public class HomeViewModel extends AndroidViewModel {
         return quoteRepository.getAllQuotes();
     }
 
+    public void delete(Quote quote) {
+        quoteRepository.delete(quote);
+    }
+
+    public void insert(Quote quote) {
+        quoteRepository.insert(quote);
+    }
+
 }

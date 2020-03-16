@@ -24,6 +24,7 @@ import java.util.Objects;
 import ebj.yujinkun.quotes.R;
 import ebj.yujinkun.quotes.model.Quote;
 import ebj.yujinkun.quotes.util.KeyConstants;
+import ebj.yujinkun.quotes.util.SoftKeyboardUtils;
 
 public class QuoteEditFragment extends Fragment {
 
@@ -69,6 +70,8 @@ public class QuoteEditFragment extends Fragment {
 
             }
         });
+
+        SoftKeyboardUtils.showSoftKeyboard(requireContext(), contentLayout.getEditText());
 
         return root;
     }

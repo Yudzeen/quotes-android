@@ -46,6 +46,17 @@ public class QuotesAdapter extends RecyclerView.Adapter<QuotesAdapter.QuotesView
         notifyDataSetChanged();
     }
 
+    public Quote delete(int position) {
+        Quote quote = quotes.remove(position);
+        notifyItemRemoved(position);
+        return quote;
+    }
+
+    public void insert(Quote quote, int position) {
+        quotes.add(position, quote);
+        notifyItemInserted(position);
+    }
+
     public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
     }
