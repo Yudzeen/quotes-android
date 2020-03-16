@@ -1,5 +1,7 @@
 package ebj.yujinkun.quotes.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
@@ -13,7 +15,7 @@ import java.util.UUID;
 import ebj.yujinkun.quotes.util.DateUtil;
 
 @Entity
-public class Quote {
+public class Quote implements Parcelable {
 
     public static final String DEFAULT_QUOTEE = "Anonymous";
 
@@ -88,6 +90,40 @@ public class Quote {
     @Override
     public int hashCode() {
         return Objects.hash(id, content, quotee, dateCreated, dateModified);
+    }
+
+    protected Quote(Parcel in) {
+        id = Objects.requireNonNull(in.readString());
+        content = in.readString();
+        quotee = in.readString();
+        dateCreated = in.readString();
+        dateModified = in.readString();
+    }
+
+    public static final Creator<Quote> CREATOR = new Creator<Quote>() {
+        @Override
+        public Quote createFromParcel(Parcel in) {
+            return new Quote(in);
+        }
+
+        @Override
+        public Quote[] newArray(int size) {
+            return new Quote[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeString(content);
+        dest.writeString(quotee);
+        dest.writeString(dateCreated);
+        dest.writeString(dateModified);
     }
 
     public static class Builder {

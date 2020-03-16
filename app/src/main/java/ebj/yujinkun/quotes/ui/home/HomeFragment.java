@@ -6,7 +6,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -22,8 +21,11 @@ import java.util.List;
 import ebj.yujinkun.quotes.R;
 import ebj.yujinkun.quotes.model.Quote;
 import ebj.yujinkun.quotes.ui.adapter.QuotesAdapter;
+import ebj.yujinkun.quotes.util.KeyConstants;
 
 public class HomeFragment extends Fragment {
+
+    private static final String TAG = HomeFragment.class.getSimpleName();
 
     private HomeViewModel homeViewModel;
     private QuotesAdapter quotesAdapter;
@@ -50,7 +52,10 @@ public class HomeFragment extends Fragment {
         quotesAdapter.setOnItemClickListener(new QuotesAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(Quote quote) {
-                Toast.makeText(getContext(), "Item clicked: " + quote.toString(), Toast.LENGTH_SHORT).show();
+                Bundle args = new Bundle();
+                args.putParcelable(KeyConstants.QUOTE_KEY, quote);
+                Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
+                        .navigate(R.id.action_nav_home_to_quoteEditFragment, args);
             }
         });
         recyclerView.setAdapter(quotesAdapter);
@@ -63,6 +68,8 @@ public class HomeFragment extends Fragment {
         });
 
         setHasOptionsMenu(true);
+
+        root.requestFocus();
 
         return root;
     }

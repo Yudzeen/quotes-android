@@ -10,12 +10,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.navigation.Navigation;
 
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -23,6 +23,7 @@ import java.util.Objects;
 
 import ebj.yujinkun.quotes.R;
 import ebj.yujinkun.quotes.model.Quote;
+import ebj.yujinkun.quotes.util.KeyConstants;
 
 public class QuoteEditFragment extends Fragment {
 
@@ -41,8 +42,16 @@ public class QuoteEditFragment extends Fragment {
 
         setHasOptionsMenu(true);
 
+        parseArguments(getArguments());
+
         contentLayout = root.findViewById(R.id.content_input);
         quoteeLayout = root.findViewById(R.id.quotee_input);
+
+        Quote originalQuote = quoteEditViewModel.getOriginalQuote();
+        if (originalQuote != null) {
+            Objects.requireNonNull(contentLayout.getEditText()).setText(originalQuote.getContent());
+            Objects.requireNonNull(quoteeLayout.getEditText()).setText(originalQuote.getQuotee());
+        }
 
         Objects.requireNonNull(contentLayout.getEditText()).addTextChangedListener(new TextWatcher() {
             @Override
@@ -82,12 +91,11 @@ public class QuoteEditFragment extends Fragment {
 
     private void save() {
         if (validate()) {
-            Quote quote = new Quote.Builder()
-                    .setContent(Objects.requireNonNull(contentLayout.getEditText()).getText().toString())
-                    .setQuotee(Objects.requireNonNull(quoteeLayout.getEditText()).getText().toString())
-                    .build();
-            quoteEditViewModel.insert(quote);
-            Toast.makeText(requireContext(), "Saved.", Toast.LENGTH_SHORT).show();
+            String content = Objects.requireNonNull(contentLayout.getEditText()).getText().toString();
+            String quotee = Objects.requireNonNull(quoteeLayout.getEditText()).getText().toString();
+            quoteEditViewModel.save(content, quotee);
+            Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
+                    .navigateUp();
         }
     }
 
@@ -104,5 +112,14 @@ public class QuoteEditFragment extends Fragment {
         }
 
         return valid;
+    }
+
+    private void parseArguments(Bundle args) {
+        if (args != null) {
+            Quote quote = args.getParcelable(KeyConstants.QUOTE_KEY);
+            if (quote != null) {
+                quoteEditViewModel.setOriginalQuote(quote);
+            }
+        }
     }
 }
