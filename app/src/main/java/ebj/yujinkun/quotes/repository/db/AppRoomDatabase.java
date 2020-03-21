@@ -11,7 +11,7 @@ import java.util.concurrent.Executors;
 
 import ebj.yujinkun.quotes.model.Quote;
 
-@Database(entities = {Quote.class}, version = 1)
+@Database(entities = {Quote.class}, version = 1, exportSchema = false)
 public abstract class AppRoomDatabase extends RoomDatabase {
 
     private static final String DB_NAME = "quote_db";
