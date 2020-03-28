@@ -1,5 +1,8 @@
 apply plugin: 'com.android.application'
 
+def privateProperties = new Properties()
+privateProperties.load(new FileInputStream(rootProject.file("private.properties")))
+
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
@@ -10,6 +13,9 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField "String", "SERVER_URL", privateProperties['SERVER_URL']
+        buildConfigField "String", "API_KEY", privateProperties['API_KEY']
     }
     buildTypes {
         release {
@@ -21,6 +27,8 @@ android {
 
 dependencies {
     def room_version = "2.2.4"
+    def volley_version = "1.1.1"
+    def work_version = "2.3.4"
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.0.2'
@@ -36,4 +44,8 @@ dependencies {
 
     implementation "androidx.room:room-runtime:$room_version"
     annotationProcessor "androidx.room:room-compiler:$room_version"
+
+    implementation "com.android.volley:volley:$volley_version"
+
+    implementation "androidx.work:work-runtime:$work_version"
 }

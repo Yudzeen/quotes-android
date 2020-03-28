@@ -9,6 +9,7 @@ import androidx.lifecycle.LiveData;
 import java.util.List;
 
 import ebj.yujinkun.quotes.model.Quote;
+import ebj.yujinkun.quotes.model.Result;
 import ebj.yujinkun.quotes.repository.QuoteRepository;
 import ebj.yujinkun.quotes.util.Injection;
 
@@ -21,7 +22,7 @@ public class HomeViewModel extends AndroidViewModel {
         quoteRepository = Injection.provideQuoteRepository(application);
     }
 
-    public LiveData<List<Quote>> getQuotes() {
+    public LiveData<Result<List<Quote>>> getQuotes() {
         return quoteRepository.getAllQuotes();
     }
 
@@ -29,8 +30,8 @@ public class HomeViewModel extends AndroidViewModel {
         quoteRepository.delete(quote);
     }
 
-    public void insert(Quote quote) {
-        quoteRepository.insert(quote);
+    public void sync() {
+        quoteRepository.sync();
     }
 
 }

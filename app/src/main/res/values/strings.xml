@@ -14,4 +14,5 @@
     <string name="save">Save</string>
     <string name="anonymous">Anonymous</string>
     <string name="undo">Undo</string>
+    <string name="error_occured">An error occurred. Please try again later.</string>
 </resources>
