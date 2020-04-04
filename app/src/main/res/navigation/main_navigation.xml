@@ -11,16 +11,10 @@
         android:label="@string/menu_home"
         tools:layout="@layout/fragment_home" >
         <action
-            android:id="@+id/action_nav_home_to_quoteEditFragment"
-            app:destination="@id/quoteEditFragment"
-            app:enterAnim="@anim/nav_default_pop_enter_anim"
-            app:exitAnim="@anim/nav_default_pop_exit_anim" />
+            android:id="@+id/action_nav_home_to_quote_edit_navigation"
+            app:destination="@id/quote_edit_navigation" />
     </fragment>
 
-    <fragment
-        android:id="@+id/quoteEditFragment"
-        android:name="ebj.yujinkun.quotes.ui.edit.QuoteEditFragment"
-        android:label="@string/fragment_quote_edit_label"
-        tools:layout="@layout/fragment_quote_edit" />
+    <include app:graph="@navigation/quote_edit_navigation" />
 
 </navigation>

@@ -13,6 +13,7 @@ import ebj.yujinkun.quotes.util.Injection;
 public class QuoteEditViewModel extends AndroidViewModel {
 
     private QuoteRepository quoteRepository;
+
     private Quote originalQuote;
 
     public QuoteEditViewModel(@NonNull Application application) {
@@ -28,13 +29,13 @@ public class QuoteEditViewModel extends AndroidViewModel {
         return originalQuote;
     }
 
-    public void save(String content, String quotee) {
+    public Quote getNewQuote(String content, String quotee) {
         if (originalQuote == null) {
             Quote quote = new Quote.Builder()
                     .setContent(content)
                     .setQuotee(quotee)
                     .build();
-            insert(quote);
+            return quote;
         } else {
             Quote quote = new Quote.Builder()
                     .from(originalQuote)
@@ -42,7 +43,7 @@ public class QuoteEditViewModel extends AndroidViewModel {
                     .setQuotee(quotee)
                     .setDateModified(DateUtil.getCurrentDate())
                     .build();
-            update(quote);
+            return quote;
         }
     }
 
@@ -53,4 +54,5 @@ public class QuoteEditViewModel extends AndroidViewModel {
     public void update(Quote quote) {
         quoteRepository.update(quote);
     }
+
 }

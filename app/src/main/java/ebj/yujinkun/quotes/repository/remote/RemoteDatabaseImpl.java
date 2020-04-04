@@ -104,6 +104,7 @@ public class RemoteDatabaseImpl implements RemoteDatabase {
 
     @Override
     public void insert(final Quote quote, final InsertCallback callback) {
+        Log.d(TAG, "insert: " + quote.toString());
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, SERVER_URL, null,
                 new Response.Listener<JSONObject>() {
                     @Override
@@ -159,6 +160,7 @@ public class RemoteDatabaseImpl implements RemoteDatabase {
 
     @Override
     public void update(final Quote quote, final UpdateCallback callback) {
+        Log.d(TAG, "update: " + quote.toString());
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.PUT, SERVER_URL, null,
                 new Response.Listener<JSONObject>() {
                     @Override
@@ -214,6 +216,7 @@ public class RemoteDatabaseImpl implements RemoteDatabase {
 
     @Override
     public void delete(final Quote quote, final DeleteCallback callback) {
+        Log.d(TAG, "delete: " + quote.toString());
         String url = SERVER_URL + "/" + quote.getId();
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.DELETE, url, null,
                 new Response.Listener<JSONObject>() {

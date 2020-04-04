@@ -15,4 +15,8 @@
     <string name="anonymous">Anonymous</string>
     <string name="undo">Undo</string>
     <string name="error_occured">An error occurred. Please try again later.</string>
+    <string name="please_connect">Please connect to the internet.</string>
+    <string name="no_network_connection">No network connection.</string>
+    <string name="ok">Ok</string>
+    <string name="title_activity_quote_edit">QuoteEditActivity</string>
 </resources>

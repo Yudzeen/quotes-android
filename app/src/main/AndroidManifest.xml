@@ -13,6 +13,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".ui.edit.QuoteEditActivity"
+            android:label="@string/title_activity_quote_edit"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">

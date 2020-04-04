@@ -1,42 +1,33 @@
-package ebj.yujinkun.quotes;
+package ebj.yujinkun.quotes.ui.edit;
 
 import android.os.Bundle;
 
-import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import com.google.android.material.navigation.NavigationView;
+import ebj.yujinkun.quotes.R;
 
-public class MainActivity extends AppCompatActivity {
+public class QuoteEditActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
-    private MainViewModel mainViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_quote_edit);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-        mAppBarConfiguration = new AppBarConfiguration.Builder(R.id.nav_home)
-                .setDrawerLayout(drawer)
-                .build();
+
+        mAppBarConfiguration = new AppBarConfiguration.Builder(R.id.quoteEditFragment2).build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
-        NavigationUI.setupWithNavController(navigationView, navController);
 
-        mainViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+        navController.setGraph(R.navigation.quote_edit_navigation, getIntent().getExtras());
     }
 
     @Override

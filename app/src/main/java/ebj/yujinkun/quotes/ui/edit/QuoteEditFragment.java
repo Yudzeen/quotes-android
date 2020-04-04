@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -13,6 +14,8 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
@@ -24,7 +27,6 @@ import java.util.Objects;
 import ebj.yujinkun.quotes.R;
 import ebj.yujinkun.quotes.model.Quote;
 import ebj.yujinkun.quotes.util.KeyConstants;
-import ebj.yujinkun.quotes.util.SoftKeyboardUtils;
 
 public class QuoteEditFragment extends Fragment {
 
@@ -44,6 +46,7 @@ public class QuoteEditFragment extends Fragment {
         setHasOptionsMenu(true);
 
         parseArguments(getArguments());
+        setupActionBar();
 
         contentLayout = root.findViewById(R.id.content_input);
         quoteeLayout = root.findViewById(R.id.quotee_input);
@@ -71,8 +74,6 @@ public class QuoteEditFragment extends Fragment {
             }
         });
 
-        SoftKeyboardUtils.showSoftKeyboard(requireContext(), contentLayout.getEditText());
-
         return root;
     }
 
@@ -85,18 +86,28 @@ public class QuoteEditFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.action_save) {
-            save();
+        switch (id) {
+            case android.R.id.home:
+                Navigation.findNavController(requireActivity(), R.id.nav_host_fragment).navigateUp();
+                return true;
+            case R.id.action_save:
+                save();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-
-        return super.onOptionsItemSelected(item);
     }
 
     private void save() {
         if (validate()) {
             String content = Objects.requireNonNull(contentLayout.getEditText()).getText().toString();
             String quotee = Objects.requireNonNull(quoteeLayout.getEditText()).getText().toString();
-            quoteEditViewModel.save(content, quotee);
+            Quote quote = quoteEditViewModel.getNewQuote(content, quotee);
+            if (quoteEditViewModel.getOriginalQuote() == null) {
+                quoteEditViewModel.insert(quote);
+            } else {
+                quoteEditViewModel.update(quote);
+            }
             Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
                     .navigateUp();
         }
@@ -124,5 +135,21 @@ public class QuoteEditFragment extends Fragment {
                 quoteEditViewModel.setOriginalQuote(quote);
             }
         }
+    }
+
+    private void setupActionBar() {
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        if (activity != null) {
+            ActionBar actionBar = activity.getSupportActionBar();
+            if (actionBar != null) {
+                actionBar.setDisplayHomeAsUpEnabled(true);
+                actionBar.setHomeAsUpIndicator(R.drawable.ic_close);
+            } else {
+                Log.w(TAG, "Action bar is null.");
+            }
+        } else {
+            Log.w(TAG, "Activity is null, can't setup action bar.");
+        }
+
     }
 }

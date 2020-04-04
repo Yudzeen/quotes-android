@@ -1,6 +1,7 @@
-package ebj.yujinkun.quotes.ui.home;
+package ebj.yujinkun.quotes;
 
 import android.app.Application;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -13,11 +14,13 @@ import ebj.yujinkun.quotes.model.Result;
 import ebj.yujinkun.quotes.repository.QuoteRepository;
 import ebj.yujinkun.quotes.util.Injection;
 
-public class HomeViewModel extends AndroidViewModel {
+public class MainViewModel extends AndroidViewModel {
+
+    private static final String TAG = MainViewModel.class.getSimpleName();
 
     private QuoteRepository quoteRepository;
 
-    public HomeViewModel(@NonNull Application application) {
+    public MainViewModel(@NonNull Application application) {
         super(application);
         quoteRepository = Injection.provideQuoteRepository(application);
     }
@@ -34,4 +37,9 @@ public class HomeViewModel extends AndroidViewModel {
         quoteRepository.sync();
     }
 
+    @Override
+    protected void onCleared() {
+        Log.d(TAG, "onCleared");
+        super.onCleared();
+    }
 }

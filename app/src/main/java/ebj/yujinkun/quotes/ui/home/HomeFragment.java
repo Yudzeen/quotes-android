@@ -1,5 +1,7 @@
 package ebj.yujinkun.quotes.ui.home;
 
+import android.net.ConnectivityManager;
+import android.net.Network;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,6 +13,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -23,12 +26,14 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
 
+import ebj.yujinkun.quotes.MainViewModel;
 import ebj.yujinkun.quotes.R;
 import ebj.yujinkun.quotes.model.Quote;
 import ebj.yujinkun.quotes.model.Result;
 import ebj.yujinkun.quotes.ui.adapter.QuotesAdapter;
 import ebj.yujinkun.quotes.ui.common.FadeItemSwipeCallback;
 import ebj.yujinkun.quotes.util.KeyConstants;
+import ebj.yujinkun.quotes.util.NetworkUtil;
 
 public class HomeFragment extends Fragment {
 
@@ -36,15 +41,57 @@ public class HomeFragment extends Fragment {
 
     private ProgressBar progressBar;
 
-    private HomeViewModel homeViewModel;
+    private MainViewModel mainViewModel;
     private QuotesAdapter quotesAdapter;
+    private AlertDialog networkDialog;
+    private SwipeRefreshLayout swipeContainer;
+
+    private ConnectivityManager.NetworkCallback networkCallback = new ConnectivityManager.NetworkCallback() {
+        @Override
+        public void onAvailable(@NonNull Network network) {
+            hideNoNetworkMessage();
+            mainViewModel.sync();
+        }
+
+        @Override
+        public void onLost(@NonNull Network network) {
+            showNoNetworkMessage();
+        }
+    };
+
+    private Observer<Result<List<Quote>>> observer = new Observer<Result<List<Quote>>>() {
+        @Override
+        public void onChanged(Result<List<Quote>> result) {
+            Log.d(TAG, "Result received. " + result.toString());
+            if (result.getStatus() == Result.Status.IN_PROGRESS) {
+                if (!swipeContainer.isRefreshing()) {
+                    progressBar.setVisibility(View.VISIBLE);
+                } else {
+                    progressBar.setVisibility(View.GONE);
+                }
+            } else {
+                swipeContainer.setRefreshing(false);
+                progressBar.setVisibility(View.GONE);
+                if (result.getStatus() == Result.Status.SUCCESS) {
+                    quotesAdapter.setQuotes(result.getResource());
+                } else {    // error case
+                    if (!NetworkUtil.isConnected(requireContext())) {
+                        showNoNetworkMessage();
+                    } else {
+                        Toast.makeText(getContext(), R.string.error_occured, Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        }
+    };
 
     public HomeFragment() {}    // required public constructor
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        homeViewModel =
-                ViewModelProviders.of(this).get(HomeViewModel.class);
+        Log.d(TAG, "onCreateView");
+        mainViewModel =
+                ViewModelProviders.of(requireActivity()).get(MainViewModel.class);
         final View root = inflater.inflate(R.layout.fragment_home, container, false);
 
         FloatingActionButton fab = root.findViewById(R.id.fab);
@@ -52,7 +99,7 @@ public class HomeFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
-                        .navigate(R.id.action_nav_home_to_quoteEditFragment);
+                        .navigate(R.id.quote_edit_navigation);
             }
         });
 
@@ -63,16 +110,16 @@ public class HomeFragment extends Fragment {
             @Override
             public void onItemSwiped(final int position) {
                 final Quote quote = quotesAdapter.get(position);
-                homeViewModel.delete(quote);
+                mainViewModel.delete(quote);
             }
         }));
         itemTouchHelper.attachToRecyclerView(recyclerView);
 
-        final SwipeRefreshLayout swipeContainer = root.findViewById(R.id.swipe_container);
+        swipeContainer = root.findViewById(R.id.swipe_container);
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                homeViewModel.sync();
+                mainViewModel.sync();
             }
         });
 
@@ -83,36 +130,17 @@ public class HomeFragment extends Fragment {
                 Bundle args = new Bundle();
                 args.putParcelable(KeyConstants.QUOTE_KEY, quote);
                 Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
-                        .navigate(R.id.action_nav_home_to_quoteEditFragment, args);
+                        .navigate(R.id.action_nav_home_to_quote_edit_navigation, args);
             }
         });
         recyclerView.setAdapter(quotesAdapter);
 
-        homeViewModel.sync();
-
-        homeViewModel.getQuotes().observe(this, new Observer<Result<List<Quote>>>() {
-            @Override
-            public void onChanged(Result<List<Quote>> result) {
-                Log.d(TAG, "Result received. " + result.toString());
-                if (result.getStatus() == Result.Status.IN_PROGRESS) {
-                    if (!swipeContainer.isRefreshing()) {
-                        progressBar.setVisibility(View.VISIBLE);
-                    } else {
-                        progressBar.setVisibility(View.GONE);
-                    }
-                } else {
-                    swipeContainer.setRefreshing(false);
-                    progressBar.setVisibility(View.GONE);
-                    if (result.getStatus() == Result.Status.SUCCESS) {
-                        quotesAdapter.setQuotes(result.getResource());
-                    } else {    // error case
-                        Toast.makeText(getContext(), getString(R.string.error_occured), Toast.LENGTH_SHORT).show();
-                    }
-                }
-            }
-        });
+        mainViewModel.getQuotes().observe(this, observer);
 
         setHasOptionsMenu(true);
+
+        networkDialog = NetworkUtil.createNetworkDialog(requireContext());
+        NetworkUtil.registerNetworkListener(requireContext(), networkCallback);
 
         root.requestFocus();
 
@@ -120,7 +148,37 @@ public class HomeFragment extends Fragment {
     }
 
     @Override
+    public void onDestroyView() {
+        Log.d(TAG, "onDestroyView");
+        NetworkUtil.unregisterNetworkListener(requireContext(), networkCallback);
+        mainViewModel.getQuotes().removeObserver(observer);
+        super.onDestroyView();
+    }
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.main, menu);
+    }
+
+    public void showNoNetworkMessage() {
+        if (!networkDialog.isShowing()) {
+            requireActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    networkDialog.show();
+                }
+            });
+        }
+    }
+
+    public void hideNoNetworkMessage() {
+        if (networkDialog.isShowing()) {
+            requireActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    networkDialog.dismiss();
+                }
+            });
+        }
     }
 }
