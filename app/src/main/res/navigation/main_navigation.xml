@@ -12,7 +12,11 @@
         tools:layout="@layout/fragment_home" >
         <action
             android:id="@+id/action_nav_home_to_quote_edit_navigation"
-            app:destination="@id/quote_edit_navigation" />
+            app:destination="@id/quote_edit_navigation"
+            app:enterAnim="@anim/slide_up"
+            app:exitAnim="@android:anim/fade_out"
+            app:popEnterAnim="@android:anim/fade_in"
+            app:popExitAnim="@anim/slide_down" />
     </fragment>
 
     <include app:graph="@navigation/quote_edit_navigation" />

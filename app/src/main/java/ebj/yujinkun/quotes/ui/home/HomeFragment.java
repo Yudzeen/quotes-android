@@ -100,7 +100,7 @@ public class HomeFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
-                        .navigate(R.id.quote_edit_navigation);
+                        .navigate(R.id.action_nav_home_to_quote_edit_navigation);
             }
         });
 
