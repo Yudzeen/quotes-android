@@ -11,6 +11,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -27,6 +28,7 @@ import java.util.Objects;
 import ebj.yujinkun.quotes.R;
 import ebj.yujinkun.quotes.model.Quote;
 import ebj.yujinkun.quotes.util.KeyConstants;
+import ebj.yujinkun.quotes.util.NetworkUtil;
 
 public class QuoteEditFragment extends Fragment {
 
@@ -114,6 +116,12 @@ public class QuoteEditFragment extends Fragment {
     }
 
     private boolean validate() {
+        if (!NetworkUtil.isConnected(requireContext())) {
+            Log.d(TAG, "validate: No network connection");
+            Toast.makeText(requireContext(), R.string.please_connect, Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
         boolean valid = true;
 
         if (TextUtils.isEmpty(Objects.requireNonNull(contentLayout.getEditText()).getText())) {
