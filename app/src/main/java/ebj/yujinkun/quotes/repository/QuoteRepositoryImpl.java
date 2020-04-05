@@ -26,6 +26,7 @@ public class QuoteRepositoryImpl implements QuoteRepository {
     private QuoteRepositoryImpl(RemoteDatabase remoteDatabase, QuoteDao quoteDao) {
         this.quoteDao = quoteDao;
         this.remoteDatabase = remoteDatabase;
+        sync();
     }
 
     public static QuoteRepositoryImpl getInstance(RemoteDatabase remoteDatabase, QuoteDao quoteDao) {

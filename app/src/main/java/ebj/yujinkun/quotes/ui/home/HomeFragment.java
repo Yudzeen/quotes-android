@@ -49,12 +49,13 @@ public class HomeFragment extends Fragment {
     private ConnectivityManager.NetworkCallback networkCallback = new ConnectivityManager.NetworkCallback() {
         @Override
         public void onAvailable(@NonNull Network network) {
+            Log.d(TAG, "Network available.");
             hideNoNetworkMessage();
-            mainViewModel.sync();
         }
 
         @Override
         public void onLost(@NonNull Network network) {
+            Log.d(TAG, "Network lost.");
             showNoNetworkMessage();
         }
     };
@@ -119,6 +120,7 @@ public class HomeFragment extends Fragment {
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                Log.d(TAG, "onRefresh");
                 mainViewModel.sync();
             }
         });
