@@ -11,6 +11,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -29,6 +30,7 @@ import ebj.yujinkun.quotes.R;
 import ebj.yujinkun.quotes.model.Quote;
 import ebj.yujinkun.quotes.util.KeyConstants;
 import ebj.yujinkun.quotes.util.NetworkUtil;
+import ebj.yujinkun.quotes.util.SoftKeyboardUtils;
 
 public class QuoteEditFragment extends Fragment {
 
@@ -77,6 +79,21 @@ public class QuoteEditFragment extends Fragment {
         });
 
         return root;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        SoftKeyboardUtils.showSoftKeyboard(requireContext(), Objects.requireNonNull(contentLayout.getEditText()));
+    }
+
+    @Override
+    public void onDestroyView() {
+        View root = getView();
+        if (root != null) {
+            SoftKeyboardUtils.hideSoftKeyboard(requireContext(), root);
+        }
+        super.onDestroyView();
     }
 
     @Override

@@ -34,6 +34,7 @@ import ebj.yujinkun.quotes.ui.adapter.QuotesAdapter;
 import ebj.yujinkun.quotes.ui.common.FadeItemSwipeCallback;
 import ebj.yujinkun.quotes.util.KeyConstants;
 import ebj.yujinkun.quotes.util.NetworkUtil;
+import ebj.yujinkun.quotes.util.SoftKeyboardUtils;
 
 public class HomeFragment extends Fragment {
 
