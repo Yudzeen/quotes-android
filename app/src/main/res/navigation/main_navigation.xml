@@ -13,10 +13,10 @@
         <action
             android:id="@+id/action_nav_home_to_quote_edit_navigation"
             app:destination="@id/quote_edit_navigation"
-            app:enterAnim="@anim/slide_up"
-            app:exitAnim="@android:anim/fade_out"
-            app:popEnterAnim="@android:anim/fade_in"
-            app:popExitAnim="@anim/slide_down" />
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     </fragment>
 
     <include app:graph="@navigation/quote_edit_navigation" />
