@@ -24,7 +24,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
 
@@ -46,7 +45,6 @@ public class HomeFragment extends Fragment {
     private View root;
     private ProgressBar progressBar;
     private TextView connectionLabel;
-    private Snackbar refreshSnackBar;
 
     private MainViewModel mainViewModel;
     private QuotesAdapter quotesAdapter;
@@ -113,7 +111,6 @@ public class HomeFragment extends Fragment {
 
         progressBar = root.findViewById(R.id.progress_bar);
         connectionLabel = root.findViewById(R.id.connection_label);
-        refreshSnackBar = Snackbar.make(root, R.string.swipe_down_to_refresh, Snackbar.LENGTH_INDEFINITE);
 
         final RecyclerView recyclerView = root.findViewById(R.id.quotes_list);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new FadeItemSwipeCallback(new FadeItemSwipeCallback.Listener() {
@@ -130,9 +127,6 @@ public class HomeFragment extends Fragment {
             @Override
             public void onRefresh() {
                 Log.d(TAG, "onRefresh");
-                if (refreshSnackBar.isShown()) {
-                    refreshSnackBar.dismiss();
-                }
                 mainViewModel.sync();
             }
         });
@@ -182,7 +176,7 @@ public class HomeFragment extends Fragment {
                     connectionLabel.setBackgroundColor(Color.GREEN);
                     connectionLabel.setText(getString(R.string.network_connected));
                     connectionLabel.setTextColor(Color.DKGRAY);
-                    refreshSnackBar.show();
+                    mainViewModel.sync();
                 }
             }
         });
@@ -197,7 +191,6 @@ public class HomeFragment extends Fragment {
                 connectionLabel.setText(getString(R.string.no_network_connection));
                 connectionLabel.setTextColor(Color.WHITE);
                 connectionLabel.setVisibility(View.VISIBLE);
-                refreshSnackBar.dismiss();
             }
         });
     }
