@@ -1,5 +1,6 @@
 package ebj.yujinkun.quotes.ui.home;
 
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.os.Bundle;
@@ -10,10 +11,10 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -23,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
 
@@ -34,30 +36,33 @@ import ebj.yujinkun.quotes.ui.adapter.QuotesAdapter;
 import ebj.yujinkun.quotes.ui.common.FadeItemSwipeCallback;
 import ebj.yujinkun.quotes.util.KeyConstants;
 import ebj.yujinkun.quotes.util.NetworkUtil;
-import ebj.yujinkun.quotes.util.SoftKeyboardUtils;
 
 public class HomeFragment extends Fragment {
 
     private static final String TAG = HomeFragment.class.getSimpleName();
 
+    private boolean fromNetworkLost = false;
+
+    private View root;
     private ProgressBar progressBar;
+    private TextView connectionLabel;
+    private Snackbar refreshSnackBar;
 
     private MainViewModel mainViewModel;
     private QuotesAdapter quotesAdapter;
-    private AlertDialog networkDialog;
     private SwipeRefreshLayout swipeContainer;
 
     private ConnectivityManager.NetworkCallback networkCallback = new ConnectivityManager.NetworkCallback() {
         @Override
         public void onAvailable(@NonNull Network network) {
             Log.d(TAG, "Network available.");
-            hideNoNetworkMessage();
+            onNetworkAvailable();
         }
 
         @Override
         public void onLost(@NonNull Network network) {
             Log.d(TAG, "Network lost.");
-            showNoNetworkMessage();
+            onNetworkLost();
         }
     };
 
@@ -66,6 +71,7 @@ public class HomeFragment extends Fragment {
         public void onChanged(Result<List<Quote>> result) {
             Log.d(TAG, "Result received. " + result.toString());
             if (result.getStatus() == Result.Status.IN_PROGRESS) {
+                connectionLabel.setVisibility(View.GONE);
                 if (!swipeContainer.isRefreshing()) {
                     progressBar.setVisibility(View.VISIBLE);
                 } else {
@@ -78,7 +84,7 @@ public class HomeFragment extends Fragment {
                     quotesAdapter.setQuotes(result.getResource());
                 } else {    // error case
                     if (!NetworkUtil.isConnected(requireContext())) {
-                        showNoNetworkMessage();
+                        onNetworkLost();
                     } else {
                         Toast.makeText(getContext(), R.string.error_occured, Toast.LENGTH_SHORT).show();
                     }
@@ -94,7 +100,7 @@ public class HomeFragment extends Fragment {
         Log.d(TAG, "onCreateView");
         mainViewModel =
                 ViewModelProviders.of(requireActivity()).get(MainViewModel.class);
-        final View root = inflater.inflate(R.layout.fragment_home, container, false);
+        root = inflater.inflate(R.layout.fragment_home, container, false);
 
         FloatingActionButton fab = root.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -106,6 +112,8 @@ public class HomeFragment extends Fragment {
         });
 
         progressBar = root.findViewById(R.id.progress_bar);
+        connectionLabel = root.findViewById(R.id.connection_label);
+        refreshSnackBar = Snackbar.make(root, R.string.swipe_down_to_refresh, Snackbar.LENGTH_INDEFINITE);
 
         final RecyclerView recyclerView = root.findViewById(R.id.quotes_list);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new FadeItemSwipeCallback(new FadeItemSwipeCallback.Listener() {
@@ -122,6 +130,9 @@ public class HomeFragment extends Fragment {
             @Override
             public void onRefresh() {
                 Log.d(TAG, "onRefresh");
+                if (refreshSnackBar.isShown()) {
+                    refreshSnackBar.dismiss();
+                }
                 mainViewModel.sync();
             }
         });
@@ -142,7 +153,6 @@ public class HomeFragment extends Fragment {
 
         setHasOptionsMenu(true);
 
-        networkDialog = NetworkUtil.createNetworkDialog(requireContext());
         NetworkUtil.registerNetworkListener(requireContext(), networkCallback);
 
         root.requestFocus();
@@ -163,25 +173,33 @@ public class HomeFragment extends Fragment {
         inflater.inflate(R.menu.main, menu);
     }
 
-    public void showNoNetworkMessage() {
-        if (!networkDialog.isShowing()) {
-            requireActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    networkDialog.show();
+    public void onNetworkAvailable() {
+        requireActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (fromNetworkLost) {
+                    fromNetworkLost = false;
+                    connectionLabel.setBackgroundColor(Color.GREEN);
+                    connectionLabel.setText(getString(R.string.network_connected));
+                    connectionLabel.setTextColor(Color.DKGRAY);
+                    refreshSnackBar.show();
                 }
-            });
-        }
+            }
+        });
     }
 
-    public void hideNoNetworkMessage() {
-        if (networkDialog.isShowing()) {
-            requireActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    networkDialog.dismiss();
-                }
-            });
-        }
+    public void onNetworkLost() {
+        requireActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                fromNetworkLost = true;
+                connectionLabel.setBackgroundColor(getResources().getColor(android.R.color.holo_red_dark));
+                connectionLabel.setText(getString(R.string.no_network_connection));
+                connectionLabel.setTextColor(Color.WHITE);
+                connectionLabel.setVisibility(View.VISIBLE);
+                refreshSnackBar.dismiss();
+            }
+        });
     }
+
 }

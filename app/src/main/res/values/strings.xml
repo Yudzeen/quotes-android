@@ -19,4 +19,6 @@
     <string name="no_network_connection">No network connection.</string>
     <string name="ok">Ok</string>
     <string name="title_activity_quote_edit">QuoteEditActivity</string>
+    <string name="swipe_down_to_refresh">Swipe down to refresh.</string>
+    <string name="network_connected">Network connected.</string>
 </resources>

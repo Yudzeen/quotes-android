@@ -49,6 +49,10 @@ public class NetworkUtil {
     }
 
     public static AlertDialog createNetworkDialog(Context context) {
+        return createNetworkDialog(context, null);
+    }
+
+    public static AlertDialog createNetworkDialog(Context context, DialogInterface.OnDismissListener dismissListener) {
         AlertDialog dialog = new AlertDialog.Builder(context)
                 .setTitle(R.string.no_network_connection)
                 .setMessage(context.getString(R.string.please_connect))
@@ -59,6 +63,7 @@ public class NetworkUtil {
                         dialog.dismiss();
                     }
                 })
+                .setOnDismissListener(dismissListener)
                 .create();
         return dialog;
     }
