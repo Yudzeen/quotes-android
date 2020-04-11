@@ -145,8 +145,6 @@ public class HomeFragment extends Fragment {
 
         mainViewModel.getQuotes().observe(this, observer);
 
-        setHasOptionsMenu(true);
-
         NetworkUtil.registerNetworkListener(requireContext(), networkCallback);
 
         root.requestFocus();
@@ -160,11 +158,6 @@ public class HomeFragment extends Fragment {
         NetworkUtil.unregisterNetworkListener(requireContext(), networkCallback);
         mainViewModel.getQuotes().removeObserver(observer);
         super.onDestroyView();
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.main, menu);
     }
 
     public void onNetworkAvailable() {
