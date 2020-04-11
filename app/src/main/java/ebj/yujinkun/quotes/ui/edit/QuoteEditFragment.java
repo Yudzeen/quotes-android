@@ -36,6 +36,9 @@ public class QuoteEditFragment extends Fragment {
 
     private static final String TAG = QuoteEditFragment.class.getSimpleName();
 
+    private static final String CONTENT_KEY = "content_key";
+    private static final String QUOTEE_KEY = "quotee_key";
+
     private QuoteEditViewModel quoteEditViewModel;
     private TextInputLayout contentLayout;
     private TextInputLayout quoteeLayout;
@@ -94,6 +97,22 @@ public class QuoteEditFragment extends Fragment {
             SoftKeyboardUtils.hideSoftKeyboard(requireContext(), root);
         }
         super.onDestroyView();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(CONTENT_KEY, Objects.requireNonNull(contentLayout.getEditText()).getText().toString());
+        outState.putString(QUOTEE_KEY, Objects.requireNonNull(quoteeLayout.getEditText()).getText().toString());
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        if (savedInstanceState != null) {
+            Objects.requireNonNull(contentLayout.getEditText()).setText(savedInstanceState.getString(CONTENT_KEY));
+            Objects.requireNonNull(quoteeLayout.getEditText()).setText(savedInstanceState.getString(QUOTEE_KEY));
+        }
     }
 
     @Override
