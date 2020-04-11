@@ -25,7 +25,7 @@ public class SoftKeyboardUtils {
     public static void hideSoftKeyboard(Context context, View view) {
         InputMethodManager imm = (InputMethodManager) context.getSystemService(INPUT_METHOD_SERVICE);
         if (imm != null) {
-            imm.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_IMPLICIT_ONLY);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
         view.clearFocus();
     }
